@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 
+import axios from 'axios';
 
 const containerStyle = {
   width: '100%',
@@ -16,14 +17,20 @@ const center = {
 
 
 const RegisterForm = () => {
+  const [nombre, setName] = useState('');
+  const [razonSocial, setRazonSocial] = useState('');
+  const [nit, setNit] = useState('');
+  const [representante, setRepresentante] = useState('');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [nit, setNit] = useState('');
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [location, setLocation] = useState(center);
-  const [celular, setCelular] = useState('');
+  
   const [telefono, setTelefono] = useState('');
+  const [celular, setCelular] = useState('');
+
+  const [direccion, setAddress] = useState('');
+
+  const [location, setLocation] = useState(center);
 
   const [markerLocation, setMarkerLocation] = useState(null);
 
@@ -44,32 +51,63 @@ const RegisterForm = () => {
 
  
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     // Aquí puedes realizar la lógica de envío del formulario y los datos ingresados
+    console.log('Name:', nombre);
+    console.log('RazonSocial:', razonSocial);
+    console.log('NIT:', nit);
+    console.log('Representante:', representante);
+
     console.log('Email:', email);
     console.log('Password:', password);
-    console.log('NIT:', nit);
-    console.log('Name:', name);
-    console.log('Address:', address);
-    console.log('Celular:', celular);
+   
     console.log('Telefono:', telefono);
+    console.log('Celular:', celular);
+
+    console.log('Address:', direccion);
+
    if (markerLocation) {
     const { lat, lng } = markerLocation;
     console.log('Latitude:', lat);
     console.log('Longitude:', lng);
+
+    try {
+      const response = await axios.post('https://localhost:7018/api/Asiloes', {
+        nombre,
+        razonSocial,
+        nit,
+        representante,
+        email,
+        password,
+        telefono,
+        celular,
+        direccion,
+        
+       
+        latitud: markerLocation?.lat,
+        longitud: markerLocation?.lng,
+      });
+      console.log('Respuesta de la API:', response.data);
+    } catch (error) {
+      console.error('Error al enviar los datos:', error);
+    }
   }
 
     // Reiniciar los campos del formulario después del envío exitoso
+    setName('');
+    setRazonSocial('');
+    setNit('');
+    setRepresentante('');
     setEmail('');
     setPassword('');
-    setNit('');
-    setName('');
+    setTelefono('');
+    setCelular('');
     setAddress('');
     setLocation(center);
-    setCelular('');
-    setTelefono('');
+   
+    
   };
 
   return (
@@ -77,6 +115,64 @@ const RegisterForm = () => {
       <div className="bg-white m-4 p-5 rounded-md w-full md:w-[500px] lg:w-[600px] xl:w-[900px]">
         <h2 className=" text-black font-bold mb-5 ">Registro de Asilo</h2>
         <form onSubmit={handleSubmit} >
+          <div className="mb-4">
+
+            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+              Nombre
+            </label>
+            <input
+              type="text"
+              id="nombre"
+              className="mt-1 px-4 py-2 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              required
+              value={nombre}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+
+            <label htmlFor="razonSocial" className="block text-sm font-medium text-gray-700">
+              Razon Social
+            </label>
+            <input
+              type="text"
+              id="razonSocial"
+              className="mt-1 px-4 py-2 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              required
+              value={razonSocial}
+              onChange={(e) => setRazonSocial(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="nit" className="block text-sm font-medium text-gray-700">
+              NIT
+            </label>
+            <input
+              type="text"
+              id="nit"
+              className="mt-1 px-4 py-2 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              required
+              value={nit}
+              onChange={(e) => setNit(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="representante" className="block text-sm font-medium text-gray-700">
+              Representante
+            </label>
+            <input
+              type="text"
+              id="representante"
+              className="mt-1 px-4 py-2 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              required
+              value={representante}
+              onChange={(e) => setRepresentante(e.target.value)}
+            />
+          </div>
+
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Correo Electrónico
@@ -104,22 +200,9 @@ const RegisterForm = () => {
             />
             
           </div>
+
           <div className="mb-4">
-            <label htmlFor="Celular" className="block text-sm font-medium text-gray-700">
-              Celular
-            </label>
-            <input
-              type="number"
-              id="celular"
-              className="mt-1 px-4 py-2 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              required
-              value={celular}
-              onChange={(e) => setCelular(e.target.value)}
-            />
-            
-          </div>
-          <div className="mb-4">
-            <label htmlFor="Celular" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">
               Telefono
             </label>
             <input
@@ -134,44 +217,37 @@ const RegisterForm = () => {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="nit" className="block text-sm font-medium text-gray-700">
-              NIT
+            <label htmlFor="celular" className="block text-sm font-medium text-gray-700">
+              Celular
             </label>
             <input
-              type="text"
-              id="nit"
+              type="number"
+              id="celular"
               className="mt-1 px-4 py-2 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               required
-              value={nit}
-              onChange={(e) => setNit(e.target.value)}
+              value={celular}
+              onChange={(e) => setCelular(e.target.value)}
             />
+            
           </div>
+          
+
+         
+         
           <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Nombre
-            </label>
-            <input
-              type="text"
-              id="name"
-              className="mt-1 px-4 py-2 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">
               Dirección
             </label>
             <input
               type="text"
-              id="address"
+              id="direccion"
               className="mt-1 px-4 py-2 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               required
-              value={address}
+              value={direccion}
               onChange={(e) => setAddress(e.target.value)}
             />
           </div>
+
           <div className="mb-6">
             <label htmlFor="map" className="block text-sm font-medium text-gray-700">
               Ubicación en el Mapa
