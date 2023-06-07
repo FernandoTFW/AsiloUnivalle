@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate   } from 'react-router-dom';
+import axios from 'axios';
+
 
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
+
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -13,12 +17,43 @@ const Login = () => {
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
-
-  const handleSubmit = (e) => {
+  
+  const navigate = useNavigate(); 
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica para enviar los datos de inicio de sesión al servidor
-    // por ejemplo, utilizando Axios o fetch.
+
+    console.log('Email:', email);
+    console.log('Password:', password);
+    try {
+      const response = await axios.post('https://localhost:7018/api/Asiloes/login', {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        // El inicio de sesión fue exitoso
+        const token = response.data.token;
+        // Guardar el token en el almacenamiento local o en el estado de la aplicación
+
+        // Establecer el estado de inicio de sesión a true
+        setLoggedIn(true);
+
+        console.log('Usuario corecto');
+        navigate('/hello');
+      } else {
+        // El inicio de sesión falló
+        const errorMessage = response.data.message;
+        // Mostrar el mensaje de error en la interfaz de usuario
+
+        
+      }
+    } catch (error) {
+      // Manejar errores de red u otros errores de solicitud
+      console.error('Error:', error);
+    }
   };
+
+ 
 
   return (
     <div className="bg-white m-4 p-5 rounded-md w-full xl:h-[500px]  md:w-[500px] lg:w-[600px] xl:w-[900px]">
@@ -62,6 +97,7 @@ const Login = () => {
           >
             Sign In
           </button>
+          <Link to="/register">Registro</Link>
         </div>
       </form>
     </div>
