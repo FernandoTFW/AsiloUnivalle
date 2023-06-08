@@ -26,7 +26,7 @@ const Reporte = () => {
         <div className="container mx-auto max-w-screen-lg m-5 p-8">
           {data.map((item) => (
             <div
-              key={item.id}
+              key={item.idDonacion}
               className="p-4 mb-4 w-full rounded-xl group bg-white bg-opacity-50 shadow-xl hover:rounded-2xl"
             >
               <div className="p-5 space-y-2">
@@ -38,13 +38,16 @@ const Reporte = () => {
                     Descripción: {item.descripcion}
                   </p>
                   <p className="text-gray-600">
-                    Anónimo: {item.anonimo ? "Sí" : "No"}
+                    Nombre Benefactor: {item.anonimo ? "Anonimo" : item.benefactorNombre}
                   </p>
-                  <p className="text-gray-600">Estado: {item.estado}</p>
-                  <p className="text-gray-600">
-                    Dinero: {item.dinero ? `$${item.dinero.toFixed(2)}` : "N/A"}
-                  </p>
-                  <p className="text-gray-600">Items: {item.items || "N/A"}</p>
+                  {!item.dinero && (
+                    <p className="text-gray-600">Items: {item.items || "N/A"}</p>
+                  )}
+                  {item.dinero && (
+                    <p className="text-gray-600">
+                      Dinero: {`$${item.dinero.toFixed(2)}`}
+                    </p>
+                  )}
                   <p className="text-gray-600">
                     Fecha de Donación: {item.fechaDonacion}
                   </p>
