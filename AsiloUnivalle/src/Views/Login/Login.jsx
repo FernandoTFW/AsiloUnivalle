@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate   } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
-
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -17,8 +14,9 @@ const Login = () => {
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
-  
-  const navigate = useNavigate(); 
+
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -33,19 +31,21 @@ const Login = () => {
       if (response.status === 200) {
         // El inicio de sesión fue exitoso
         const token = response.data.token;
-        // Guardar el token en el almacenamiento local o en el estado de la aplicación
+        const user = response.data.asilo; // Asumiendo que la respuesta contiene un objeto `user` con los datos del usuario
+
+        // Guardar el token y los datos del usuario en el almacenamiento local
+        localStorage.setItem('token', token);
+        localStorage.setItem('userData', JSON.stringify(user));
 
         // Establecer el estado de inicio de sesión a true
         setLoggedIn(true);
 
-        console.log('Usuario corecto');
+        console.log('Usuario correcto');
         navigate('/hello');
       } else {
         // El inicio de sesión falló
         const errorMessage = response.data.message;
         // Mostrar el mensaje de error en la interfaz de usuario
-
-        
       }
     } catch (error) {
       // Manejar errores de red u otros errores de solicitud
@@ -53,10 +53,8 @@ const Login = () => {
     }
   };
 
- 
-
   return (
-    <div className="bg-white m-4 p-5 rounded-md w-full xl:h-[500px]  md:w-[500px] lg:w-[600px] xl:w-[900px]">
+    <div className="bg-gradient-to-br from-red-100 via-red-300 to-blue-500 min-h-screen flex items-center justify-center">
       <form
         className="bg-white shadow-md rounded m-auto p-10 w-full max-w-xl"
         style={{ maxWidth: '600px' }}

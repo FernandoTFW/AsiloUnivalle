@@ -112,12 +112,12 @@ const RegisterForm = () => {
 
   return (
     
-      <div className="bg-white m-4 p-5 rounded-md w-full md:w-[500px] lg:w-[600px] xl:w-[900px]">
-        <h2 className=" text-black font-bold mb-5 ">Registro de Asilo</h2>
-        <form onSubmit={handleSubmit} >
+      <div  className="bg-gradient-to-br from-red-100 via-red-300 to-blue-500 min-h-screen  items-center justify-center">
+        <h1 className=" text-black font-bold mb-5 ">Registro de Asilo</h1>
+        <form onSubmit={handleSubmit} className="ml-20 mr-20 ">
           <div className="mb-4">
 
-            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="nombre" className="block text-sm font-medium  text-gray-700">
               Nombre
             </label>
             <input
