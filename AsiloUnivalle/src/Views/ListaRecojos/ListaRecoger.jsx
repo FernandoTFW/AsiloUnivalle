@@ -13,7 +13,7 @@ const ListaRecoger = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`https://localhost:7018/api/Donacions/lista/${id}`);
+      const response = await axios.get(`https://apidelasilo.azurewebsites.net/api/Donacions/lista/${id}`);
       const sortedData = response.data.sort((a, b) => new Date(a.fechaDonacion) - new Date(b.fechaDonacion));
       setData(sortedData);
     } catch (error) {
