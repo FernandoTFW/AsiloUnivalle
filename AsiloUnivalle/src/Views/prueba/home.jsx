@@ -15,6 +15,12 @@ const HelloWorld = () => {
     navigate('/login');
   };
 
+  const openWhatsApp = () => {
+    const phoneNumber = userData.celular; // Obtener el número de teléfono desde userData
+    const whatsappUrl = `https://wa.me/${phoneNumber}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <>
       <div className="bg-gradient-to-br from-red-100 via-red-300 to-blue-500 min-h-screen flex items-center justify-center">
@@ -32,6 +38,12 @@ const HelloWorld = () => {
             onClick={handleLogout}
           >
             Cerrar sesión
+          </button>
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
+            onClick={openWhatsApp}
+          >
+            Contactar por WhatsApp
           </button>
         </div>
       </div>

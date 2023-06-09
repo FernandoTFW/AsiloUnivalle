@@ -24,9 +24,9 @@ const Reporte = () => {
     try {
       const estado = data.find((donacion) => donacion.idDonacion === donacionId)?.estado;
       const updatedDonacion = data.find((donacion) => donacion.idDonacion === donacionId);
-  
+
       console.log(estado);
-  
+
       if (updatedDonacion) {
         if (estado === 1) {
           updatedDonacion.estado = 2;
@@ -34,9 +34,9 @@ const Reporte = () => {
           updatedDonacion.estado = 3;
           updatedDonacion.fechaRecojo = new Date().toISOString(); // Actualizar la fecha de recojo con la fecha del servidor
         }
-  
+
         delete updatedDonacion.benefactorNombre; // Eliminar la propiedad benefactorNombre
-      
+
         await axios.put(`https://apidelasilo.azurewebsites.net//api/Donacions/${donacionId}`, updatedDonacion);
         window.location.reload(); // Refrescar la página después de actualizar
       } else {
@@ -65,6 +65,11 @@ const Reporte = () => {
     donacion.hoverText = "";
 
     setData([...data]);
+  };
+
+  const openWhatsApp = (celular) => {
+    const whatsappUrl = `https://wa.me/${celular}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const renderButton = (donacion) => {
@@ -137,6 +142,12 @@ const Reporte = () => {
                 </div>
                 {/* Resto del contenido de la tarjeta */}
                 {renderButton(item)}
+                <button
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
+                  onClick={() => openWhatsApp(item.celular)}
+                >
+                  Contactar a {item.celular} por WhatsApp
+                </button>
               </div>
             </div>
           ))}
