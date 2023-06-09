@@ -1,4 +1,3 @@
-
 import { Routes, Route } from "react-router-dom";
 import RegisterForm from "../../Views/SingUp/SingUpAsilo";
 import Login from "../../Views/Login/Login";
@@ -20,5 +19,3 @@ const Routing = () => {
 };
 
 export default Routing;
-
-
