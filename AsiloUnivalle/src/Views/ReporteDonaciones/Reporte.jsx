@@ -13,10 +13,90 @@ const Reporte = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`https://localhost:7018/api/Donacions/${id}`);
+      const response = await axios.get(`https://apidelasilo.azurewebsites.net/api/Donacions/${id}`);
       setData(response.data);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const updateDonacionEstado = async (donacionId) => {
+    try {
+      const estado = data.find((donacion) => donacion.idDonacion === donacionId)?.estado;
+      const updatedDonacion = data.find((donacion) => donacion.idDonacion === donacionId);
+  
+      console.log(estado);
+  
+      if (updatedDonacion) {
+        if (estado === 1) {
+          updatedDonacion.estado = 2;
+        } else if (estado === 2) {
+          updatedDonacion.estado = 3;
+          updatedDonacion.fechaRecojo = new Date().toISOString(); // Actualizar la fecha de recojo con la fecha del servidor
+        }
+  
+        delete updatedDonacion.benefactorNombre; // Eliminar la propiedad benefactorNombre
+      
+        await axios.put(`https://apidelasilo.azurewebsites.net//api/Donacions/${donacionId}`, updatedDonacion);
+        window.location.reload(); // Refrescar la página después de actualizar
+      } else {
+        console.log('Donación no encontrada');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleMouseEnter = (donacionId) => {
+    const donacion = data.find((donacion) => donacion.idDonacion === donacionId);
+
+    if (donacion?.estado === 1) {
+      donacion.hoverText = "Entregar";
+    } else if (donacion?.estado === 2) {
+      donacion.hoverText = "Finalizar";
+    }
+
+    setData([...data]);
+  };
+
+  const handleMouseLeave = (donacionId) => {
+    const donacion = data.find((donacion) => donacion.idDonacion === donacionId);
+
+    donacion.hoverText = "";
+
+    setData([...data]);
+  };
+
+  const renderButton = (donacion) => {
+    const estado = donacion.estado;
+    const hoverText = donacion.hoverText || "";
+
+    if (estado === 1) {
+      return (
+        <button
+          onClick={() => updateDonacionEstado(donacion.idDonacion)}
+          onMouseEnter={() => handleMouseEnter(donacion.idDonacion)}
+          onMouseLeave={() => handleMouseLeave(donacion.idDonacion)}
+        >
+          {hoverText || "Pendiente"}
+        </button>
+      );
+    } else if (estado === 2) {
+      return (
+        <button
+          onClick={() => updateDonacionEstado(donacion.idDonacion)}
+          onMouseEnter={() => handleMouseEnter(donacion.idDonacion)}
+          onMouseLeave={() => handleMouseLeave(donacion.idDonacion)}
+        >
+          {hoverText || "En entrega"}
+        </button>
+      );
+    } else if (estado === 3) {
+      return (
+        <button disabled>Finalizado</button>
+      );
+    } else {
+      return null;
     }
   };
 
@@ -56,6 +136,7 @@ const Reporte = () => {
                   </p>
                 </div>
                 {/* Resto del contenido de la tarjeta */}
+                {renderButton(item)}
               </div>
             </div>
           ))}

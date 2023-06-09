@@ -74,7 +74,7 @@ const RegisterForm = () => {
     console.log('Longitude:', lng);
 
     try {
-      const response = await axios.post('https://localhost:7018/api/Asiloes', {
+      const response = await axios.post('https://apidelasilo.azurewebsites.net/api/Asiloes', {
         nombre,
         razonSocial,
         nit,
