@@ -26,6 +26,7 @@ const HelloWorld = () => {
             </p>
           )}
           <Link className='bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4' to={`/report/${2}`}>Reporte</Link>
+          <Link className='bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4' to={`/lista/${2}`}>Lista Pendientes</Link>
           <button
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
             onClick={handleLogout}
