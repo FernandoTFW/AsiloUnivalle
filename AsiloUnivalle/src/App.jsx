@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import './App.css'
+import RegisterForm from './Views/SingUp/SingUpAsilo'
+
+import { BrowserRouter } from 'react-router-dom';
 import Routing from './components/Routes/routing'
+import Login from './Views/Login/Login';
+
+import './index.css'; 
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <Routing/>
-    </>
-  )
+      <Routing />
+  );
 }
 
-export default App
+export default App;
