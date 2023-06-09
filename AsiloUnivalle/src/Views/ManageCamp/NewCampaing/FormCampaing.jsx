@@ -10,7 +10,8 @@ import { addDoc, collection } from "firebase/firestore";
 
 export function FormCampaing() {
   const navigate = useNavigate();
-  let IdAsilo = 1;
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  let IdAsilo = userData.idAsilo;
   const [Nombre, SetCampName] = useState("");
   const [Requerimiento, SetRequirements] = useState("");
   const [FechaInicio, SetLaunchDate] = useState("");
@@ -27,6 +28,7 @@ export function FormCampaing() {
     e.preventDefault();
 
     let UrlImagen = "";
+    let IdCampaign = 1;
     let aux = Array.from(images);
     const newUrl = await UploadFiles(aux[0]);
     UrlImagen = newUrl;
@@ -36,21 +38,28 @@ export function FormCampaing() {
 
     if (fecha1 <= fecha2) {
       Estado = 0;
-      
     } else {
       Estado = 2;
     }
+
     try {
       if (Nombre && Requerimiento && FechaInicio && FechaFin) {
         const campaingCollectionRef = collection(db, "campaings");
-        
+        const response = await fetch(
+          "https://apidelasilo.azurewebsites.net/api/LastId"
+        );
+        const data = await response.json();
+
+        IdCampaign += data;
+        console.log(IdCampaign);
+        console.log(data);
         let newCampaing = {
           Nombre,
           Requerimiento,
           Beneficiario,
           UrlImagen,
-          FechaInicio:new Date(FechaInicio).toISOString(),
-          FechaFin:new Date(FechaFin).toISOString(),
+          FechaInicio: new Date(FechaInicio).toISOString(),
+          FechaFin: new Date(FechaFin).toISOString(),
           Estado,
           IdAsilo,
         };
@@ -58,16 +67,20 @@ export function FormCampaing() {
         await addDoc(campaingCollectionRef, {
           Nombre: Nombre,
           Requerimiento: Requerimiento,
-          UrlImagen:UrlImagen,
+          UrlImagen: UrlImagen,
           Beneficiario: Beneficiario,
           FechaInicio: FechaInicio,
           FechaFin: FechaFin,
           Estado: Estado,
           IdAsilo: IdAsilo,
+          IdCampana: IdCampaign,
         });
 
         axios
-          .post("https://apidelasilo.azurewebsites.net/api/Campanas",newCampaing)
+          .post(
+            "https://apidelasilo.azurewebsites.net/api/Campanas",
+            newCampaing
+          )
           .then((response) => {
             console.log(response);
             navigate("/Campaings");

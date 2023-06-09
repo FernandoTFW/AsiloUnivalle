@@ -1,27 +1,41 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
-  storage,
   db,
   UploadFiles,
 } from "../../../components/firebase/connection";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { Data } from "@react-google-maps/api";
 
 export function EditFormCampaing() {
   const navigate = useNavigate();
-  let IdAsilo = 1;
+  const location = useLocation();
+  const { id } = useParams();
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  let IdAsilo = userData.idAsilo;
+  let Estado = 0;
+  let initial = new Date();
+  let end= new Date();
+  let formatedInitial;
+  let formatedEnd;
+
   const [Nombre, SetCampName] = useState("");
   const [Requerimiento, SetRequirements] = useState("");
   const [FechaInicio, SetLaunchDate] = useState("");
   const [FechaFin, SetEndDate] = useState("");
   const [Beneficiario, SetType] = useState(0);
-  let [Campaing,SetCampaing] = useState(null);
-  let Estado = 0;
+  let [Campaing, SetCampaing] = useState(null);
   const [images, SetImages] = useState(null);
-  const searchParams = new URLSearchParams(window.location.search)
-  let id = searchParams.get('id')==null? null:searchParams.get('id').toString();
-  const location = useLocation();
+
   const handleImageUpload = (e) => {
     SetImages(e.target.files);
   };
@@ -31,35 +45,35 @@ export function EditFormCampaing() {
       .then((response) => response.json())
       .then((data) => {
         SetCampaing(data);
-        SetCampName(Campaing.nombre);
-        SetRequirements(Campaing.requerimiento);
-        SetLaunchDate(Campaing.fechaInicio);
-        SetEndDate(Campaing.fechaFin);
-        SetType(Campaing.beneficiario);
-
+        SetCampName(data.nombre);
+        SetRequirements(data.requerimiento);
+        SetLaunchDate(data.fechaInicio);
+        initial = new Date(data.fechaInicio)
+        formatedInitial = initial.toISOString().split('T')[0];
+        SetEndDate(data.fechaFin);
+        end = new Date(data.fechaFin);
+        formatedEnd = end.toISOString().split('T')[0];
+        SetType(data.beneficiario);
       })
       .catch((error) => console.log(error));
-  }, [location]);
+  }, []);
 
   const submitCampaign = async (e) => {
     e.preventDefault();
     let UrlImagen = "";
-    if(images != null){
-        let aux = Array.from(images);
-        const newUrl = await UploadFiles(aux[0]);
-        UrlImagen = newUrl;
+    if (images != null) {
+      let aux = Array.from(images);
+      const newUrl = await UploadFiles(aux[0]);
+      UrlImagen = newUrl;
     }
-    
-    
 
     const fecha1 = new Date(FechaInicio);
     const fecha2 = new Date();
 
     if (fecha1 <= fecha2) {
       Estado = 0;
-      
     } else {
-      Estado = 2;
+      Estado = Campaing.estado;
     }
     try {
       if (Nombre && Requerimiento && FechaInicio && FechaFin) {
@@ -68,33 +82,36 @@ export function EditFormCampaing() {
         Campaing.fechaInicio = FechaInicio;
         Campaing.fechaFin = FechaFin;
         Campaing.beneficiario = Beneficiario;
-        const campaingCollectionRef = collection(db, "campaings");
+        if (UrlImagen == "") {
+          UrlImagen = Campaing.urlImagen;
+        }
         let newCampaing = {
+          IdCampana: Campaing.idCampana,
           Nombre,
           Requerimiento,
           Beneficiario,
           UrlImagen,
-          FechaInicio:new Date(FechaInicio).toISOString(),
-          FechaFin:new Date(FechaFin).toISOString(),
+          FechaInicio: new Date(FechaInicio).toISOString(),
+          FechaFin: new Date(FechaFin).toISOString(),
           Estado,
           IdAsilo,
         };
-        console.log(newCampaing);
-        await addDoc(campaingCollectionRef, {
-          Nombre: Nombre,
-          Requerimiento: Requerimiento,
-          UrlImagen:UrlImagen,
-          Beneficiario: Beneficiario,
-          FechaInicio: FechaInicio,
-          FechaFin: FechaFin,
-          Estado: Estado,
-          IdAsilo: IdAsilo,
+        const q = query(
+          collection(db, "campaings"),
+          where("IdCampana", "==", Campaing.idCampana)
+        );
+
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc2) => {
+          updateDoc(doc(db, "campaings", doc2.id), newCampaing );
         });
 
         axios
-          .post("https://apidelasilo.azurewebsites.net/api/Campanas",newCampaing)
+          .put(
+            "https://apidelasilo.azurewebsites.net/api/Campanas/"+Campaing.idCampana,
+            Campaing
+          )
           .then((response) => {
-            console.log(response);
             navigate("/Campaings");
           })
           .catch((error) => {
@@ -167,7 +184,7 @@ export function EditFormCampaing() {
             onChange={(e) => {
               SetType(parseInt(e.target.value));
             }}
-            value={1}
+            value={Beneficiario}
           >
             <option value={0}>Anciano</option>
             <option value={1} selected>
@@ -176,17 +193,6 @@ export function EditFormCampaing() {
             <option value={2}>Institucion</option>
           </select>
         </div>
-        {/* <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2">
-            Beneficiario
-          </label>
-          <input
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-            type="text"
-            value={beneficiary}
-            onChange={(e) => SetBeneficiary(e.target.value)}
-          ></input>
-        </div> */}
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2">
             Fecha de lanzamiento
@@ -194,7 +200,7 @@ export function EditFormCampaing() {
           <input
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
             type="date"
-            value={FechaInicio}
+            value={formatedInitial}
             onChange={(e) => SetLaunchDate(e.target.value)}
           ></input>
         </div>
@@ -205,7 +211,7 @@ export function EditFormCampaing() {
           <input
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
             type="date"
-            value={FechaFin}
+            value={formatedEnd}
             onChange={(e) => SetEndDate(e.target.value)}
           ></input>
         </div>
@@ -231,4 +237,4 @@ export function EditFormCampaing() {
     </div>
   );
 }
-export default FormCampaing;
+export default EditFormCampaing;

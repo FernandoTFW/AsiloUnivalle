@@ -10,11 +10,7 @@ import './index.css';
 
 function App() {
   return (
-    <BrowserRouter>
-     
       <Routing />
-     
-    </BrowserRouter>
   );
 }
 

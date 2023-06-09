@@ -6,11 +6,12 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 export function ListCamp() {
   const [campaings, SetCampaings] = useState([]);
+  const userData = JSON.parse(localStorage.getItem('userData'));
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`https://apidelasilo.azurewebsites.net/api/CampanasIns/${1}`)
+    fetch(`https://apidelasilo.azurewebsites.net/api/CampanasIns/${userData.idAsilo}`)
       .then((response) => response.json())
       .then((data) => {
         SetCampaings(data);

@@ -41,7 +41,7 @@ const Login = () => {
         setLoggedIn(true);
 
         console.log('Usuario correcto');
-        navigate('/hello');
+        navigate('/Campaings');
       } else {
         // El inicio de sesión falló
         const errorMessage = response.data.message;
