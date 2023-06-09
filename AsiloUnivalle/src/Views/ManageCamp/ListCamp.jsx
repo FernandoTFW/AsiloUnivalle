@@ -6,12 +6,22 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 export function ListCamp() {
   const [campaings, SetCampaings] = useState([]);
-  const userData = JSON.parse(localStorage.getItem('userData'));
+  const userData = JSON.parse(localStorage.getItem("userData"));
   const location = useLocation();
   const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    // Eliminar los datos de inicio de sesión del almacenamiento local
+    localStorage.clear();
+
+    // Redireccionar al inicio de sesión
+    navigate('/login');
+  };
 
   useEffect(() => {
-    fetch(`https://apidelasilo.azurewebsites.net/api/CampanasIns/${userData.idAsilo}`)
+    fetch(
+      `https://apidelasilo.azurewebsites.net/api/CampanasIns/${userData.idAsilo}`
+    )
       .then((response) => response.json())
       .then((data) => {
         SetCampaings(data);
@@ -21,6 +31,12 @@ export function ListCamp() {
 
   return (
     <>
+      <button
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
+        onClick={handleLogout}
+      >
+        Cerrar sesión
+      </button>
       <button
         type="button"
         class="border border-green-500 bg-green-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-green-600 focus:outline-none focus:shadow-outline"
@@ -49,9 +65,7 @@ export function ListCamp() {
               <th scope="col" class="px-6 py-4 font-medium text-gray-900">
                 Estado de Campaña
               </th>
-              <th scope="col" class="px-6 py-4 font-medium text-gray-900">
-                
-              </th>
+              <th scope="col" class="px-6 py-4 font-medium text-gray-900"></th>
               <th scope="col" class="px-6 py-4 font-medium text-gray-900">
                 Fecha de inicio
               </th>
@@ -100,9 +114,7 @@ export function ListCamp() {
               <th scope="col" class="px-6 py-4 font-medium text-gray-900">
                 Estado de Campaña
               </th>
-              <th scope="col" class="px-6 py-4 font-medium text-gray-900">
-                
-              </th>
+              <th scope="col" class="px-6 py-4 font-medium text-gray-900"></th>
               <th scope="col" class="px-6 py-4 font-medium text-gray-900">
                 Fecha de inicio
               </th>
@@ -151,9 +163,7 @@ export function ListCamp() {
               <th scope="col" class="px-6 py-4 font-medium text-gray-900">
                 Estado de Campaña
               </th>
-              <th scope="col" class="px-6 py-4 font-medium text-gray-900">
-                
-              </th>
+              <th scope="col" class="px-6 py-4 font-medium text-gray-900"></th>
               <th scope="col" class="px-6 py-4 font-medium text-gray-900">
                 Fecha de inicio
               </th>

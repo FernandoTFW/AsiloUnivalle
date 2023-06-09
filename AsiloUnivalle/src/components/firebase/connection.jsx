@@ -4,13 +4,15 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {v4} from 'uuid'
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCcXMipr7U-Ukt_EVxTw-WE_-UBgEfkFrg",
-    authDomain: "asiloprueba-c9f28.firebaseapp.com",
-    projectId: "asiloprueba-c9f28",
-    storageBucket: "asiloprueba-c9f28.appspot.com",
-    messagingSenderId: "1006064524190",
-    appId: "1:1006064524190:web:aa89489541a2af3063148f"
-  };
+  apiKey: "AIzaSyA4nnLzYcNwvAtdpl3UPePRiSETjXbvkXo",
+  authDomain: "asilo-216aa.firebaseapp.com",
+  databaseURL: "https://asilo-216aa-default-rtdb.firebaseio.com",
+  projectId: "asilo-216aa",
+  storageBucket: "asilo-216aa.appspot.com",
+  messagingSenderId: "734552314732",
+  appId: "1:734552314732:web:198c8a8412c7353c931949",
+  measurementId: "G-SJWYV82KJC"
+};
 
 const app = initializeApp(firebaseConfig);
 

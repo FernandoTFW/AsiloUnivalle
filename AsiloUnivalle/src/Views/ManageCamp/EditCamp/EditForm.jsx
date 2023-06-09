@@ -79,8 +79,8 @@ export function EditFormCampaing() {
       if (Nombre && Requerimiento && FechaInicio && FechaFin) {
         Campaing.nombre = Nombre;
         Campaing.requerimiento = Requerimiento;
-        Campaing.fechaInicio = FechaInicio;
-        Campaing.fechaFin = FechaFin;
+        Campaing.fechaInicio = new Date(FechaInicio);
+        Campaing.fechaFin = new Date(FechaFin);
         Campaing.beneficiario = Beneficiario;
         if (UrlImagen == "") {
           UrlImagen = Campaing.urlImagen;
@@ -91,8 +91,8 @@ export function EditFormCampaing() {
           Requerimiento,
           Beneficiario,
           UrlImagen,
-          FechaInicio: new Date(FechaInicio).toISOString(),
-          FechaFin: new Date(FechaFin).toISOString(),
+          FechaInicio: new Date(FechaInicio),
+          FechaFin: new Date(FechaFin),
           Estado,
           IdAsilo,
         };

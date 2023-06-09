@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { useNavigate } from "react-router-dom";
 
 import axios from 'axios';
 
@@ -17,6 +18,7 @@ const center = {
 
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const [nombre, setName] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
   const [nit, setNit] = useState('');
@@ -106,6 +108,8 @@ const RegisterForm = () => {
     setCelular('');
     setAddress('');
     setLocation(center);
+    navigate("/login");
+
    
     
   };

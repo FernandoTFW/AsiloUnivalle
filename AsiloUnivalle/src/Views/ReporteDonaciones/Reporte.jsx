@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Await, useParams } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { db } from "../../components/firebase/connection";
+import {
+  doc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 
 const Reporte = () => {
   const { id } = useParams(); // Obtener el ID de la URL
   const [data, setData] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Llamar a la API cuando el componente se monte
@@ -15,23 +22,30 @@ const Reporte = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        `https://apidelasilo.azurewebsites.net/api/Donacions/${id}`
-      );
+      const response = await axios.get(`https://apidelasilo.azurewebsites.net/api/Donacions/${id}`);
       setData(response.data);
     } catch (error) {
       console.log(error);
     }
   };
 
+  async function Update(idDonacion,estado,fechaRecojo) {
+    const q = query(
+      collection(db, "donacion"),
+      where("IdDonacion", "==", idDonacion)
+    );
+  
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc2) => {
+      console.log(doc2.id, " => ", doc2.data());
+      updateDoc(doc(db, "donacion", doc2.id), { Estado: estado, FechaRecojo: fechaRecojo });
+    });
+  }
+
   const updateDonacionEstado = async (donacionId) => {
     try {
-      const estado = data.find(
-        (donacion) => donacion.idDonacion === donacionId
-      )?.estado;
-      const updatedDonacion = data.find(
-        (donacion) => donacion.idDonacion === donacionId
-      );
+      const estado = data.find((donacion) => donacion.idDonacion === donacionId)?.estado;
+      const updatedDonacion = data.find((donacion) => donacion.idDonacion === donacionId);
 
       console.log(estado);
 
@@ -45,13 +59,11 @@ const Reporte = () => {
 
         delete updatedDonacion.benefactorNombre; // Eliminar la propiedad benefactorNombre
 
-        await axios.put(
-          `https://apidelasilo.azurewebsites.net//api/Donacions/${donacionId}`,
-          updatedDonacion
-        );
-        window.location.reload(); // Refrescar la página después de actualizar
+        await axios.put(`https://apidelasilo.azurewebsites.net//api/Donacions/${donacionId}`, updatedDonacion);
+        await Update(donacionId,updatedDonacion.estado,updatedDonacion.fechaRecojo);
+        //window.location.reload(); // Refrescar la página después de actualizar
       } else {
-        console.log("Donación no encontrada");
+        console.log('Donación no encontrada');
       }
     } catch (error) {
       console.log(error);
@@ -59,9 +71,7 @@ const Reporte = () => {
   };
 
   const handleMouseEnter = (donacionId) => {
-    const donacion = data.find(
-      (donacion) => donacion.idDonacion === donacionId
-    );
+    const donacion = data.find((donacion) => donacion.idDonacion === donacionId);
 
     if (donacion?.estado === 1) {
       donacion.hoverText = "Entregar";
@@ -73,13 +83,16 @@ const Reporte = () => {
   };
 
   const handleMouseLeave = (donacionId) => {
-    const donacion = data.find(
-      (donacion) => donacion.idDonacion === donacionId
-    );
+    const donacion = data.find((donacion) => donacion.idDonacion === donacionId);
 
     donacion.hoverText = "";
 
     setData([...data]);
+  };
+
+  const openWhatsApp = (celular) => {
+    const whatsappUrl = `https://wa.me/${celular}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const renderButton = (donacion) => {
@@ -107,7 +120,9 @@ const Reporte = () => {
         </button>
       );
     } else if (estado === 3) {
-      return <button disabled>Finalizado</button>;
+      return (
+        <button disabled>Finalizado</button>
+      );
     } else {
       return null;
     }
@@ -117,15 +132,6 @@ const Reporte = () => {
     <>
       <div className="bg-gradient-to-br from-red-100 via-red-300 to-blue-500 min-h-screen flex items-center justify-center">
         <div className="container mx-auto max-w-screen-lg m-5 p-8">
-          <button
-            type="button"
-            class="border border-red-500 bg-red-500 text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-red-600 focus:outline-none focus:shadow-outline"
-            onClick={() => {
-              navigate("/Campaings");
-            }}
-          >
-            Atras
-          </button>
           {data.map((item) => (
             <div
               key={item.idDonacion}
@@ -140,13 +146,10 @@ const Reporte = () => {
                     Descripción: {item.descripcion}
                   </p>
                   <p className="text-gray-600">
-                    Nombre Benefactor:{" "}
-                    {item.anonimo ? "Anonimo" : item.benefactorNombre}
+                    Nombre Benefactor: {item.anonimo ? "Anonimo" : item.benefactorNombre}
                   </p>
                   {!item.dinero && (
-                    <p className="text-gray-600">
-                      Items: {item.items || "N/A"}
-                    </p>
+                    <p className="text-gray-600">Items: {item.items || "N/A"}</p>
                   )}
                   {item.dinero && (
                     <p className="text-gray-600">
@@ -162,6 +165,12 @@ const Reporte = () => {
                 </div>
                 {/* Resto del contenido de la tarjeta */}
                 {renderButton(item)}
+                <button
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
+                  onClick={() => openWhatsApp(item.celular)}
+                >
+                  Contactar a {item.celular} por WhatsApp
+                </button>
               </div>
             </div>
           ))}
