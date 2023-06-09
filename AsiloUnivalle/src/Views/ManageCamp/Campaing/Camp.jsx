@@ -1,8 +1,65 @@
 import React from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-class Camp extends React.Component {
-  render() {
-    const { campaingName,requirements,name, status, initialDate, endDate } = this.props;
+export function Camp (props){
+    let { camp,id,campaingName,requirements,beneficiary, status, initialDate, endDate } = props;
+    const navigate = useNavigate();
+    let benef = "";
+    switch (beneficiary) {
+      case 0:
+        benef = "Anciano"
+        break;
+      case 1:
+        benef = "Grupo de Ancianos"
+        break;
+      case 2:
+        benef = "Institucion"
+        break;
+    }
+    
+
+    const handleDelete = (e)=> {
+      e.preventDefault();
+      camp.estado = 3;
+      axios
+        .put("https://apidelasilo.azurewebsites.net/api/Campanas/"+id,camp)
+        .then((response) => {
+          console.log(response);
+          navigate("/Campaings");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+
+    const handleActive = (e)=> {
+      e.preventDefault();
+      camp.estado = 0;
+      axios
+        .put("https://apidelasilo.azurewebsites.net/api/Campanas/"+id,camp)
+        .then((response) => {
+          console.log(response);
+          navigate("/Campaings");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+
+    const handleClose = (e)=> {
+      e.preventDefault();
+      camp.estado = 1;
+      axios
+        .put("https://apidelasilo.azurewebsites.net/api/Campanas/"+id,camp)
+        .then((response) => {
+          console.log(response);
+          navigate("/Campaings");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
 
     return (
       <tr>
@@ -23,18 +80,28 @@ class Camp extends React.Component {
         <td className="px-6 py-4">
           <div className="flex items-center space-x-3">
             <div>
-              <div className="text-sm font-medium text-gray-900">{name}</div>
+              <div className="text-sm font-medium text-gray-900">{benef}</div>
             </div>
           </div>
         </td>
         <td className="px-6 py-4">
           <StatusSpan status={status} />
         </td>
+        <td className="px-6 py-4">
+        <button class='relative inline-flex text-sm sm:text-base rounded-full font-medium border-2 border-transparent transition-colors outline-transparent focus:outline-transparent disabled:opacity-50 disabled:pointer-events-none disabled:opacity-40 disabled:hover:opacity-40 disabled:cursor-not-allowed disabled:shadow-none
+        text-white bg-green-500 hover:bg-green-700 focus:border-[#B3B3FD] focus:bg-green-600 mb-2 px-4 py-1 sm:py-1 sm:px-2' onClick={handleActive}>
+            Activar
+        </button>
+        <button class='relative inline-flex text-sm sm:text-base rounded-full font-medium border-2 border-transparent transition-colors outline-transparent focus:outline-transparent disabled:opacity-50 disabled:pointer-events-none disabled:opacity-40 disabled:hover:opacity-40 disabled:cursor-not-allowed disabled:shadow-none
+        text-white bg-red-500 hover:bg-red-800 focus:bg-red-800 px-4 py-1 sm:py-1 sm:px-2' onClick={handleClose}>
+            Cerrar
+        </button>
+        </td>
         <td className="px-6 py-4 text-sm text-gray-500">{initialDate}</td>
         <td className="px-6 py-4 text-sm text-gray-500">{endDate}</td>
         <td class="px-6 py-4">
           <div class="flex justify-end gap-4">
-            <a x-data="{ tooltip: 'Delete' }" href="#">
+            <a x-data="{ tooltip: 'Delete' }" onClick={handleDelete} href="#">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -96,18 +163,17 @@ class Camp extends React.Component {
       </tr>
     );
   }
-}
 
 function StatusSpan({ status }) {
   let statusName ="";
   switch(status){
-    case 1:
+    case 0:
         statusName = "Activo"
         break;
     case 2:
-        statusName = "Suspendida"
+        statusName = "Espera"
         break;
-    case 3:
+    case 1:
         statusName = "Cerrada"
         break;
     default:
@@ -128,11 +194,11 @@ function StatusSpan({ status }) {
 
 function getStatus(status) {
   switch (status) {
-    case 1:
+    case 0:
       return "bg-green-100 text-green-800";
     case 2:
       return "bg-yellow-100 text-yellow-800";
-    case 3:
+    case 1:
       return "bg-red-100 text-red-800";
     default:
       return "bg-gray-100 text-gray-800";

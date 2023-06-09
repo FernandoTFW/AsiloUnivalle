@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import {
   storage,
   db,
@@ -8,7 +8,7 @@ import {
 } from "../../../components/firebase/connection";
 import { addDoc, collection } from "firebase/firestore";
 
-export function FormCampaing() {
+export function EditFormCampaing() {
   const navigate = useNavigate();
   let IdAsilo = 1;
   const [Nombre, SetCampName] = useState("");
@@ -16,20 +16,41 @@ export function FormCampaing() {
   const [FechaInicio, SetLaunchDate] = useState("");
   const [FechaFin, SetEndDate] = useState("");
   const [Beneficiario, SetType] = useState(0);
+  let [Campaing,SetCampaing] = useState(null);
   let Estado = 0;
-  const [images, SetImages] = useState();
-
+  const [images, SetImages] = useState(null);
+  const searchParams = new URLSearchParams(window.location.search)
+  let id = searchParams.get('id')==null? null:searchParams.get('id').toString();
+  const location = useLocation();
   const handleImageUpload = (e) => {
     SetImages(e.target.files);
   };
 
+  useEffect(() => {
+    fetch(`https://apidelasilo.azurewebsites.net/api/Campanas/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        SetCampaing(data);
+        SetCampName(Campaing.nombre);
+        SetRequirements(Campaing.requerimiento);
+        SetLaunchDate(Campaing.fechaInicio);
+        SetEndDate(Campaing.fechaFin);
+        SetType(Campaing.beneficiario);
+
+      })
+      .catch((error) => console.log(error));
+  }, [location]);
+
   const submitCampaign = async (e) => {
     e.preventDefault();
-
     let UrlImagen = "";
-    let aux = Array.from(images);
-    const newUrl = await UploadFiles(aux[0]);
-    UrlImagen = newUrl;
+    if(images != null){
+        let aux = Array.from(images);
+        const newUrl = await UploadFiles(aux[0]);
+        UrlImagen = newUrl;
+    }
+    
+    
 
     const fecha1 = new Date(FechaInicio);
     const fecha2 = new Date();
@@ -42,8 +63,12 @@ export function FormCampaing() {
     }
     try {
       if (Nombre && Requerimiento && FechaInicio && FechaFin) {
+        Campaing.nombre = Nombre;
+        Campaing.requerimiento = Requerimiento;
+        Campaing.fechaInicio = FechaInicio;
+        Campaing.fechaFin = FechaFin;
+        Campaing.beneficiario = Beneficiario;
         const campaingCollectionRef = collection(db, "campaings");
-        
         let newCampaing = {
           Nombre,
           Requerimiento,
@@ -142,6 +167,7 @@ export function FormCampaing() {
             onChange={(e) => {
               SetType(parseInt(e.target.value));
             }}
+            value={1}
           >
             <option value={0}>Anciano</option>
             <option value={1} selected>
@@ -150,6 +176,17 @@ export function FormCampaing() {
             <option value={2}>Institucion</option>
           </select>
         </div>
+        {/* <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">
+            Beneficiario
+          </label>
+          <input
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+            type="text"
+            value={beneficiary}
+            onChange={(e) => SetBeneficiary(e.target.value)}
+          ></input>
+        </div> */}
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2">
             Fecha de lanzamiento
